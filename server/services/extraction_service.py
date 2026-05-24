@@ -4,6 +4,7 @@ import httpx
 import structlog
 
 from config import settings
+from services.llm_usage import parse_usage
 
 logger = structlog.get_logger()
 
@@ -15,11 +16,11 @@ DEEPSEEK_HEADERS = {
 }
 
 
-async def extract_receipt_data(ocr_text: str, prompt: str) -> dict:
-    """Step 2: Data extraction — raw OCR text to structured JSON."""
+async def extract_receipt_data(ocr_text: str, prompt: str) -> tuple[dict, dict]:
+    """Step 2: Data extraction — raw OCR text to structured JSON. Returns (data, usage)."""
     if not settings.DEEPSEEK_API_KEY:
         logger.warning("deepseek_api_key_missing", step="extraction")
-        return _mock_extraction(ocr_text)
+        return _mock_extraction(ocr_text), {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     async with httpx.AsyncClient(timeout=60.0) as client:
         payload = {
@@ -40,7 +41,8 @@ async def extract_receipt_data(ocr_text: str, prompt: str) -> dict:
         response.raise_for_status()
         result = response.json()
         content = result["choices"][0]["message"]["content"]
-        return json.loads(content)
+        usage = parse_usage(result)
+        return json.loads(content), usage
 
 
 def _mock_extraction(ocr_text: str) -> dict:

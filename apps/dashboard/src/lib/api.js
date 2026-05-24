@@ -127,6 +127,11 @@ export const api = {
   createUser: (data) => request('/api/users/', { method: 'POST', body: data }),
   updateUser: (id, data) => request(`/api/users/${id}`, { method: 'PATCH', body: data }),
   deleteUser: (id) => request(`/api/users/${id}`, { method: 'DELETE' }),
+
+  // Monitoring (Admin)
+  getMonitoringHealth: () => request('/api/monitoring/health'),
+  getProcessingJobs: (params) => request(`/api/monitoring/jobs${buildQuery(params)}`),
+  getProcessingJobStats: (params) => request(`/api/monitoring/jobs/stats${buildQuery(params)}`),
 };
 
 export { ApiError, getToken };

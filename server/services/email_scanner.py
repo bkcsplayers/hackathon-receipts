@@ -7,11 +7,14 @@ import structlog
 
 from core.security import decrypt_password
 from models.email_inbox import EmailInbox
+from services.pdf_service import pdf_first_page_to_png
+from services.processing_tracker import create_job, fail_job
 from services.upload_pipeline import process_receipt_upload
 
 logger = structlog.get_logger()
 
 IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"}
+ATTACHMENT_TYPES = IMAGE_TYPES | {"application/pdf"}
 
 
 async def scan_single_inbox(inbox: EmailInbox, db) -> int:
@@ -31,7 +34,7 @@ async def scan_single_inbox(inbox: EmailInbox, db) -> int:
                 raw = client.fetch([msg_id], ["RFC822"])
                 msg = email.message_from_bytes(raw[msg_id][b"RFC822"], policy=policy.default)
 
-                receipt = await process_email_receipt(msg, inbox.user_id, db)
+                receipt = await process_email_receipt(msg, inbox.user_id, db, inbox_email=inbox.email_address)
                 if receipt:
                     receipt.source = "EMAIL"
                     processed += 1
@@ -51,14 +54,38 @@ async def scan_single_inbox(inbox: EmailInbox, db) -> int:
     return processed
 
 
-async def process_email_receipt(msg, user_id, db):
+async def process_email_receipt(msg, user_id, db, inbox_email: str | None = None):
     sender = msg.get("from", "")
 
     for part in msg.walk():
         content_type = part.get_content_type()
-        if content_type in IMAGE_TYPES:
-            file_bytes = part.get_payload(decode=True)
-            filename = part.get_filename() or f"email_receipt_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+        if content_type not in ATTACHMENT_TYPES:
+            continue
+
+        file_bytes = part.get_payload(decode=True)
+        if not file_bytes:
+            continue
+
+        filename = part.get_filename() or f"email_receipt_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+
+        if content_type == "application/pdf":
+            try:
+                file_bytes = await pdf_first_page_to_png(file_bytes)
+                filename = (filename.rsplit(".", 1)[0] + ".png") if "." in filename else f"{filename}.png"
+            except Exception as exc:
+                logger.error("pdf_convert_failed", error=str(exc), filename=filename)
+                continue
+
+        job = await create_job(
+            db,
+            source="EMAIL",
+            user_id=user_id,
+            filename=filename,
+            inbox_email=inbox_email,
+        )
+        await db.commit()
+
+        try:
             receipt = await process_receipt_upload(
                 file_bytes=file_bytes,
                 filename=filename,
@@ -67,9 +94,14 @@ async def process_email_receipt(msg, user_id, db):
                 gps_longitude=None,
                 db_session=db,
                 source="EMAIL",
+                job_id=job.id,
             )
-            logger.info("email_receipt_processed", receipt_id=str(receipt.id), from_email=sender)
+            logger.info("email_receipt_processed", receipt_id=str(receipt.id), from_email=sender, job_id=str(job.id))
             return receipt
+        except Exception as exc:
+            await fail_job(db, job.id, str(exc))
+            await db.commit()
+            raise
 
     body = msg.get_body(preferencelist=("html", "plain"))
     if body:

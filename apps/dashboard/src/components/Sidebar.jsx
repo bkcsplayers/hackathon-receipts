@@ -7,6 +7,7 @@ import {
   BarChart3,
   Settings,
   Lock,
+  Activity,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../hooks/useAuth';
@@ -20,6 +21,7 @@ const navItems = [
   { to: '/receipts', icon: Receipt, labelKey: 'nav.receipts' },
   { to: '/members', icon: Users, labelKey: 'nav.members', adminOnly: true },
   { to: '/comparison', icon: BarChart3, labelKey: 'nav.comparison', adminOnly: true },
+  { to: '/monitoring', icon: Activity, labelKey: 'nav.monitoring', adminOnly: true },
   { to: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ];
 

@@ -10,6 +10,7 @@ from sse_starlette.sse import EventSourceResponse
 from core.deps import get_current_user, get_db
 from models.audit_log import AuditLog
 from models.user import User
+from services.processing_tracker import create_job, fail_job
 from services.upload_pipeline import process_receipt_upload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -51,6 +52,14 @@ async def upload_receipt(
     file_bytes = await file.read()
     _validate_upload(file, file_bytes)
 
+    job = await create_job(
+        db,
+        source="WEB",
+        user_id=current_user.id,
+        filename=file.filename or "receipt.jpg",
+    )
+    await db.commit()
+
     try:
         receipt = await process_receipt_upload(
             file_bytes=file_bytes,
@@ -59,8 +68,12 @@ async def upload_receipt(
             gps_latitude=latitude,
             gps_longitude=longitude,
             db_session=db,
+            source="WEB",
+            job_id=job.id,
         )
     except Exception as exc:
+        await fail_job(db, job.id, str(exc))
+        await db.commit()
         logger.exception("upload_failed", user_id=str(current_user.id))
         raise HTTPException(status_code=502, detail=f"Receipt processing failed: {exc}") from exc
 
@@ -88,6 +101,9 @@ async def upload_receipt_stream(
     _validate_upload(file, file_bytes)
     filename = file.filename or "receipt.jpg"
 
+    job = await create_job(db, source="WEB", user_id=current_user.id, filename=filename)
+    await db.commit()
+
     async def event_generator():
         progress_queue: asyncio.Queue = asyncio.Queue()
 
@@ -103,6 +119,8 @@ async def upload_receipt_stream(
                 gps_longitude=longitude,
                 db_session=db,
                 progress_callback=progress_callback,
+                source="WEB",
+                job_id=job.id,
             )
         )
 
@@ -120,6 +138,8 @@ async def upload_receipt_stream(
         try:
             result = task.result()
         except Exception as exc:
+            await fail_job(db, job.id, str(exc))
+            await db.commit()
             logger.exception("upload_stream_failed", user_id=str(current_user.id))
             yield {"event": "error", "data": json.dumps({"message": str(exc)})}
             return

@@ -34,7 +34,11 @@ uploads/
 *.heic
 /Image_*.jpg
 *.jpg
+*.png
 !docs/**/*.jpg
 
 # SSL
 certbot/
+
+# Docs (local only, not pushed)
+docs/

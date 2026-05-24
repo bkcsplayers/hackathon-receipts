@@ -10,6 +10,7 @@ import ReceiptDetailPage from './pages/ReceiptDetailPage';
 import MembersPage from './pages/MembersPage';
 import ComparisonPage from './pages/ComparisonPage';
 import SettingsPage from './pages/SettingsPage';
+import MonitoringPage from './pages/MonitoringPage';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route element={<AdminRoute />}>
               <Route path="/members" element={<MembersPage />} />
               <Route path="/comparison" element={<ComparisonPage />} />
+              <Route path="/monitoring" element={<MonitoringPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     DEEPSEEK_MODEL: str = "deepseek-chat"
     DEEPSEEK_VISION_MODEL: str = ""
 
+    # Optional separate keys/URLs for monitoring (falls back to DEEPSEEK_* when provider matches)
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    DEEPSEEK_DIRECT_API_KEY: str = ""
+    DEEPSEEK_DIRECT_BASE_URL: str = "https://api.deepseek.com"
+
     # Cloudflare R2
     R2_ENDPOINT: str = ""
     R2_BUCKET_NAME: str = "hackathon-receipt-helper"
@@ -58,6 +64,15 @@ class Settings(BaseSettings):
     APP_NAME: str = "Hackathon Receipt Helper"
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
     DEFAULT_CURRENCY: str = "CAD"
+    DASHBOARD_URL: str = "http://localhost:4512"
+    MOBILE_URL: str = "http://localhost:4511"
+    # Public URLs shown in monitor UI (browser-facing); probes use DASHBOARD_URL / MOBILE_URL
+    DASHBOARD_PUBLIC_URL: str = ""
+    MOBILE_PUBLIC_URL: str = ""
+
+    # LLM cost estimates (USD per 1M tokens) for monitoring display
+    LLM_COST_INPUT_PER_1M: float = 3.0
+    LLM_COST_OUTPUT_PER_1M: float = 15.0
 
     # Seed / login
     ADMIN_USERNAME: str = "admin"

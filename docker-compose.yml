@@ -31,6 +31,12 @@ services:
     ports:
       - "4510:4510"
     env_file: .env
+    environment:
+      # API runs inside Docker — use service names, not localhost
+      DASHBOARD_URL: http://dashboard:4512
+      MOBILE_URL: http://mobile:4511
+      DASHBOARD_PUBLIC_URL: http://localhost:4512
+      MOBILE_PUBLIC_URL: http://localhost:4511
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,6 +76,7 @@ services:
       - "4512:4512"
     volumes:
       - ./apps/dashboard/src:/app/src
+      - ./apps/dashboard/vite.config.js:/app/vite.config.js
     environment:
       - VITE_API_URL=http://localhost:4510
       - VITE_MAPBOX_TOKEN=${MAPBOX_ACCESS_TOKEN}

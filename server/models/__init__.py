@@ -3,6 +3,8 @@ from models.audit_log import AuditLog
 from models.base import Base
 from models.category_correction import CategoryCorrection
 from models.email_inbox import EmailInbox
+from models.processing_job import ProcessingJob
+from models.worker_heartbeat import WorkerHeartbeat
 from models.item_fingerprint import ItemFingerprint
 from models.monthly_metric import MonthlyMetric
 from models.receipt import Receipt
@@ -22,4 +24,6 @@ __all__ = [
     "AnalysisReport",
     "EmailInbox",
     "AuditLog",
+    "ProcessingJob",
+    "WorkerHeartbeat",
 ]
