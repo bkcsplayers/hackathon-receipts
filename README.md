@@ -516,26 +516,18 @@ The knowledge graph reveals **53 interconnected communities** including:
 
 ## How to Explore
 
-### 1. Read the Report
-Open the full atomic analysis report:
-```bash
-# Markdown report — works in any editor or GitHub
-open GRAPH_REPORT.md
+### 1. Interactive Graph Visualization (Live)
+Open the interactive D3.js knowledge graph directly in your browser:
 
-# Or view on GitHub directly:
-# https://github.com/bkcsplayers/hackathon-receipts/blob/main/GRAPH_REPORT.md
-```
+**[🔗 Open Live Knowledge Graph →](https://bkcsplayers.github.io/hackathon-receipts/graph.html)**
 
-### 2. Interactive Graph Visualization
-Open the interactive D3.js knowledge graph in any browser:
-```bash
-# Local HTML — no server required
-open graphify-out/graph.html
-```
+Supports zoom, pan, search, and community-based exploration of all 577 nodes and 935 edges. No server needed — works on desktop and mobile.
 
-The HTML graph supports zoom, pan, search, and community-based exploration of all 577 nodes and 935 edges.
+### 2. Read the Markdown Report
+- **[GRAPH_REPORT.md](GRAPH_REPORT.md)** — Full audit trail with god nodes, community hubs, and surprising cross-community connections
+- View on GitHub: [github.com/bkcsplayers/hackathon-receipts/blob/main/GRAPH_REPORT.md](https://github.com/bkcsplayers/hackathon-receipts/blob/main/GRAPH_REPORT.md)
 
-### 3. Query the Graph
+### 3. Query the Graph Locally
 Use graphify CLI to ask natural-language questions:
 ```bash
 # BFS traversal — broad context
