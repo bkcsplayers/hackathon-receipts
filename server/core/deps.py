@@ -52,7 +52,8 @@ async def require_admin(user: User = Depends(get_current_user)) -> User:
 
 
 def get_user_filter(current_user: User, view: str = "personal"):
-    """Return SQLAlchemy WHERE condition for receipt queries."""
+    """Return list of SQLAlchemy WHERE conditions for receipt queries. Always excludes duplicates."""
+    filters = [Receipt.is_duplicate == False]
     if current_user.role != "admin" or view == "personal":
-        return Receipt.user_id == current_user.id
-    return True
+        filters.append(Receipt.user_id == current_user.id)
+    return filters

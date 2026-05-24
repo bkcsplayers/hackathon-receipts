@@ -21,8 +21,7 @@ async def get_map_points(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    filters = [
-        get_user_filter(current_user, view),
+    filters = get_user_filter(current_user, view) + [
         Receipt.latitude.isnot(None),
         Receipt.longitude.isnot(None),
         Receipt.status == "completed",
@@ -72,8 +71,7 @@ async def get_merchant_history(
     db: AsyncSession = Depends(get_db),
 ):
     decoded_name = unquote(store_name)
-    filters = [
-        get_user_filter(current_user, view),
+    filters = get_user_filter(current_user, view) + [
         Receipt.store_name == decoded_name,
         Receipt.status == "completed",
     ]

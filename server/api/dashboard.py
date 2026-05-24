@@ -23,7 +23,7 @@ PAYMENT_LABELS = {
 
 
 def _base_filters(current_user: User, view: str, period: str, start: str | None, end: str | None):
-    filters = [get_user_filter(current_user, view), Receipt.status == "completed"]
+    filters = get_user_filter(current_user, view) + [Receipt.status == "completed"]
     period_filter = apply_period_filter(Receipt.transaction_date, period, start, end)
     if period_filter is not True:
         filters.append(period_filter)
@@ -147,8 +147,7 @@ async def get_trend(
         d = date(y, m + 1, 1)
         month_key = d.strftime("%Y-%m")
         year, month = map(int, month_key.split("-"))
-        filters = [
-            get_user_filter(current_user, view),
+        filters = get_user_filter(current_user, view) + [
             Receipt.status == "completed",
             extract("year", Receipt.transaction_date) == year,
             extract("month", Receipt.transaction_date) == month,
@@ -233,8 +232,7 @@ async def get_daily(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    filters = [
-        get_user_filter(current_user, view),
+    filters = get_user_filter(current_user, view) + [
         Receipt.status == "completed",
         extract("year", Receipt.transaction_date) == year,
     ]
@@ -335,7 +333,7 @@ async def get_member_comparison(
     family_total = 0.0
 
     for user in users.scalars().all():
-        filters = [Receipt.user_id == user.id, Receipt.status == "completed"]
+        filters = [Receipt.user_id == user.id, Receipt.status == "completed", Receipt.is_duplicate == False]
         if period_filter is not True:
             filters.append(period_filter)
 

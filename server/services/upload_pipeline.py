@@ -98,6 +98,12 @@ async def process_receipt_upload(
             transaction_date=transaction_dt,
         )
 
+        if is_duplicate and duplicate_of_id:
+            logger.info("duplicate_skipped", receipt_id=str(duplicate_of_id), store=extracted.get("store_name"))
+            existing = await db_session.get(Receipt, duplicate_of_id)
+            if existing:
+                return existing
+
         await step(5, "Saving receipt...")
         receipt = Receipt(
             user_id=user_id,

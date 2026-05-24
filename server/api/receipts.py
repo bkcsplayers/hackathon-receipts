@@ -51,7 +51,7 @@ async def list_receipts(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    filters = [get_user_filter(current_user, view)]
+    filters = get_user_filter(current_user, view)
     if category:
         filters.append(Receipt.category == category)
     if store:
