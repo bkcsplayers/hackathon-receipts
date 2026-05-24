@@ -35,6 +35,8 @@ uploads/
 /Image_*.jpg
 *.jpg
 *.png
+!assets/**/*.png
+!assets/**/*.jpg
 !docs/**/*.jpg
 
 # SSL
