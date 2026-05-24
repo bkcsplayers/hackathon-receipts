@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+*.local
+
+# Secrets & env
+.env
+.env.prod
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads & local test images
+uploads/
+*.webp
+*.heic
+/Image_*.jpg
+*.jpg
+!docs/**/*.jpg
+
+# SSL
+certbot/

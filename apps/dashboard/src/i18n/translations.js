@@ -1,0 +1,78 @@
+export const translations = {
+  en: {
+    nav: {
+      dashboard: 'Dashboard',
+      map: 'Consumption Map',
+      receipts: 'Receipts',
+      members: 'Members',
+      comparison: 'Comparison',
+      settings: 'Settings',
+      receiptDetail: 'Receipt Detail',
+    },
+    login: {
+      title: 'Hackathon Receipt',
+      subtitle: 'Admin Dashboard',
+      username: 'Username',
+      password: 'Password',
+      signIn: 'Sign In',
+      signingIn: 'Signing in...',
+      hint: 'Same account as Mobile: username admin (not email).',
+      noRegister: 'No self-registration. Contact admin for access.',
+    },
+    topBar: {
+      search: 'Search...',
+      openMenu: 'Open menu',
+    },
+    sidebar: {
+      brand: 'Hackathon Receipt',
+      adminDashboard: 'Admin Dashboard',
+      period: 'Period',
+    },
+    period: {
+      all: 'All Time',
+      this_month: 'This Month',
+      last_month: 'Last Month',
+      this_year: 'This Year',
+      last_3_months: 'Last 3 Months',
+      custom: 'Custom Range',
+    },
+  },
+  zh: {
+    nav: {
+      dashboard: '仪表盘',
+      map: '消费地图',
+      receipts: '小票列表',
+      members: '成员',
+      comparison: '对比分析',
+      settings: '设置',
+      receiptDetail: '小票详情',
+    },
+    login: {
+      title: 'Hackathon Receipt',
+      subtitle: '管理后台',
+      username: '用户名',
+      password: '密码',
+      signIn: '登录',
+      signingIn: '登录中...',
+      hint: '与 Mobile 相同账号：用户名 admin（不是邮箱）。',
+      noRegister: '不支持自助注册，请联系管理员。',
+    },
+    topBar: {
+      search: '搜索...',
+      openMenu: '打开菜单',
+    },
+    sidebar: {
+      brand: 'Hackathon Receipt',
+      adminDashboard: '管理后台',
+      period: '时间范围',
+    },
+    period: {
+      all: '全部',
+      this_month: '本月',
+      last_month: '上月',
+      this_year: '今年',
+      last_3_months: '近3个月',
+      custom: '自定义',
+    },
+  },
+};

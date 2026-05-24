@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FF8C42;
+  --color-primary-dark: #e67a35;
+  --color-secondary: #38B000;
+  --color-accent: #FFD700;
+  --color-danger: #EF4444;
+  --color-paper: #FAFAF8;
+  --color-ink: #1a1a2e;
+  --color-dark-bg: #0f1729;
+  --color-dark-card: rgba(255, 255, 255, 0.05);
+  --color-dark-text: #e4e8ef;
+  --font-display: "Outfit", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-brand: "Patrick Hand", cursive;
+  --radius-card: 1.25rem;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-paper text-ink dark:bg-dark-bg dark:text-dark-text;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-brand {
+    font-family: var(--font-brand);
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, #FF8C42 0%, #FFB347 50%, #FFD700 100%);
+  }
+
+  .gradient-card {
+    background: linear-gradient(145deg, rgba(255, 140, 66, 0.08) 0%, rgba(56, 176, 0, 0.05) 100%);
+  }
+
+  .dark .gradient-card {
+    background: linear-gradient(145deg, rgba(255, 140, 66, 0.12) 0%, rgba(56, 176, 0, 0.08) 100%);
+  }
+
+  .glass-card {
+    @apply bg-white dark:bg-white/5 backdrop-blur-sm border border-black/5 dark:border-white/10;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

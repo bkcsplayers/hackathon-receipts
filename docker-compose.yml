@@ -1,0 +1,80 @@
+version: "3.9"
+
+# Host ports use 451x series to avoid conflicts (see README)
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: receipt_user
+      POSTGRES_PASSWORD: receipt_pass
+      POSTGRES_DB: hackathon_receipt
+    ports:
+      - "4513:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U receipt_user -d hackathon_receipt"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "4514:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+
+  api:
+    build: ./server
+    ports:
+      - "4510:4510"
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 4510 --reload
+
+  worker:
+    build: ./server
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python -m tasks.email_worker
+    restart: always
+
+  mobile:
+    build:
+      context: ./apps/mobile
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4511:4511"
+    volumes:
+      - ./apps/mobile/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:4510
+    depends_on:
+      - api
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4512:4512"
+    volumes:
+      - ./apps/dashboard/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:4510
+      - VITE_MAPBOX_TOKEN=${MAPBOX_ACCESS_TOKEN}
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
