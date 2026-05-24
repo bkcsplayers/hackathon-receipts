@@ -1,4 +1,5 @@
 import json
+import re
 
 import httpx
 import structlog
@@ -16,6 +17,34 @@ DEEPSEEK_HEADERS = {
 }
 
 
+def _parse_json_content(content: str) -> dict:
+    """Extract JSON dict from LLM response. Handles markdown fences and wrapping."""
+    if not content or not content.strip():
+        raise ValueError("LLM returned empty content")
+
+    # Strip ```json ... ``` fences
+    m = re.search(r"```(?:json)?\s*([\s\S]*?)```", content)
+    if m:
+        content = m.group(1)
+
+    # Try direct parse first
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        pass
+
+    # Find the outermost { ... } block
+    start = content.find("{")
+    end = content.rfind("}")
+    if start >= 0 and end > start:
+        try:
+            return json.loads(content[start:end + 1])
+        except json.JSONDecodeError:
+            pass
+
+    raise ValueError(f"LLM response is not valid JSON: {content[:200]}")
+
+
 async def extract_receipt_data(ocr_text: str, prompt: str) -> tuple[dict, dict]:
     """Step 2: Data extraction — raw OCR text to structured JSON. Returns (data, usage)."""
     if not settings.DEEPSEEK_API_KEY:
@@ -31,7 +60,6 @@ async def extract_receipt_data(ocr_text: str, prompt: str) -> tuple[dict, dict]:
             ],
             "max_tokens": 4096,
             "temperature": 0.1,
-            "response_format": {"type": "json_object"},
         }
         response = await client.post(
             f"{settings.DEEPSEEK_BASE_URL}/chat/completions",
@@ -42,7 +70,11 @@ async def extract_receipt_data(ocr_text: str, prompt: str) -> tuple[dict, dict]:
         result = response.json()
         content = result["choices"][0]["message"]["content"]
         usage = parse_usage(result)
-        return json.loads(content), usage
+        try:
+            return _parse_json_content(content), usage
+        except ValueError:
+            logger.error("extraction_json_parse_failed", raw_content=content[:500])
+            raise
 
 
 def _mock_extraction(ocr_text: str) -> dict:
