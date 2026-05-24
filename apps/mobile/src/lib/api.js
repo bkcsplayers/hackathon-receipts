@@ -153,10 +153,10 @@ export const api = {
     }),
 
   uploadReceipt: (formData) =>
-    request('/api/upload', { method: 'POST', body: formData }),
+    request('/api/upload/', { method: 'POST', body: formData }),
 
   getReceipts: (params = {}) =>
-    request(`/api/receipts?${toQueryString(params)}`),
+    request(`/api/receipts/?${toQueryString(params)}`),
 
   getReceipt: (id) => request(`/api/receipts/${id}`),
 

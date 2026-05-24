@@ -113,7 +113,7 @@ export const api = {
     request(`/api/map/merchant/${encodeURIComponent(storeName)}${buildQuery(params)}`),
 
   // Receipts
-  listReceipts: (params) => request(`/api/receipts${buildQuery(params)}`),
+  listReceipts: (params) => request(`/api/receipts/${buildQuery(params)}`),
   getReceipt: (id) => request(`/api/receipts/${id}`),
   deleteReceipt: (id) => request(`/api/receipts/${id}`, { method: 'DELETE' }),
   updateCategory: (id, category) =>
