@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timezone
 
 import structlog
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -54,9 +55,11 @@ async def scan_all_inboxes():
 
 async def _run_worker():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(scan_all_inboxes, "interval", minutes=5)
+    scheduler.add_job(scan_all_inboxes, "interval", minutes=5, next_run_time=datetime.now(timezone.utc))
     scheduler.start()
     logger.info("email_worker_started", interval="5 minutes")
+    # Run immediately on startup
+    await scan_all_inboxes()
     try:
         while True:
             await asyncio.sleep(3600)
