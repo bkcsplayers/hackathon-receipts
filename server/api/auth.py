@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.deps import get_current_user, get_db
+from core.rate_limit import limiter
 from core.security import create_access_token
 from models.audit_log import AuditLog
 from models.user import User
@@ -13,7 +14,9 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
@@ -39,6 +42,9 @@ async def login(
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(current_user: User = Depends(get_current_user)):
+    if not current_user.is_active:
+        raise HTTPException(status_code=403, detail="Account is disabled")
+
     token = create_access_token(data={"sub": str(current_user.id), "role": current_user.role})
     return TokenResponse(
         access_token=token,

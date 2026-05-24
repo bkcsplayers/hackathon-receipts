@@ -142,7 +142,9 @@ async def get_trend(
     today = date.today()
     data = []
     for i in range(months - 1, -1, -1):
-        d = today.replace(day=1) - timedelta(days=i * 28)
+        total_months = today.year * 12 + today.month - 1 - i
+        y, m = divmod(total_months, 12)
+        d = date(y, m + 1, 1)
         month_key = d.strftime("%Y-%m")
         year, month = map(int, month_key.split("-"))
         filters = [

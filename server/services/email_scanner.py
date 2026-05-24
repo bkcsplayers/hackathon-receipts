@@ -15,6 +15,7 @@ logger = structlog.get_logger()
 
 IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"}
 ATTACHMENT_TYPES = IMAGE_TYPES | {"application/pdf"}
+MAX_EMAILS_PER_SCAN = 20
 
 
 async def scan_single_inbox(inbox: EmailInbox, db) -> int:
@@ -28,6 +29,15 @@ async def scan_single_inbox(inbox: EmailInbox, db) -> int:
         client.select_folder("INBOX")
         messages = client.search(["UNSEEN"])
         logger.info("found_unseen", count=len(messages), email=inbox.email_address)
+
+        if len(messages) > MAX_EMAILS_PER_SCAN:
+            logger.warning(
+                "email_batch_capped",
+                total_unseen=len(messages),
+                processing=MAX_EMAILS_PER_SCAN,
+                email=inbox.email_address,
+            )
+            messages = messages[-MAX_EMAILS_PER_SCAN:]
 
         for msg_id in messages:
             try:
