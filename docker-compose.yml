@@ -33,10 +33,11 @@ services:
     env_file: .env
     environment:
       # API runs inside Docker — use service names, not localhost
-      DASHBOARD_URL: http://dashboard:4512
-      MOBILE_URL: http://mobile:4511
-      DASHBOARD_PUBLIC_URL: http://localhost:4512
-      MOBILE_PUBLIC_URL: http://localhost:4511
+      # Defaults to port 80 (production nginx); override in .env for dev Vite ports
+      DASHBOARD_URL: ${DASHBOARD_URL:-http://dashboard:80}
+      MOBILE_URL: ${MOBILE_URL:-http://mobile:80}
+      DASHBOARD_PUBLIC_URL: ${DASHBOARD_PUBLIC_URL:-http://localhost:4512}
+      MOBILE_PUBLIC_URL: ${MOBILE_PUBLIC_URL:-http://localhost:4511}
     depends_on:
       postgres:
         condition: service_healthy
