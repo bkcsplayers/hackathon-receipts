@@ -44,3 +44,6 @@ certbot/
 
 # Docs (local only, not pushed)
 docs/
+
+# Graphify knowledge graph (cache + intermediate — GRAPH_REPORT.md in root is committed)
+graphify-out/

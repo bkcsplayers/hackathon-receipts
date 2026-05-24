@@ -25,7 +25,8 @@
   <a href="#-architecture">Architecture</a> •
   <a href="#-tech-stack">Tech Stack</a> •
   <a href="#-api-reference">API</a> •
-  <a href="#-deployment">Deployment</a>
+  <a href="#-deployment">Deployment</a> •
+  <a href="#-knowledge-graph-analysis">Knowledge Graph</a>
 </p>
 
 </div>
@@ -473,6 +474,93 @@ Potential future integrations:
 ├── seed.py
 └── README.md
 ```
+
+---
+
+# 🧠 Knowledge Graph Analysis
+
+This project includes a complete **atomic knowledge graph analysis** powered by [graphify](https://github.com/piotrkulpinski/graphify) — combining AST-level structural extraction with semantic LLM analysis.
+
+## Analysis Snapshot
+
+| Metric | Value |
+| ------ | ----- |
+| Files Analyzed | 166 files (~166K words) |
+| Graph Nodes | 577 |
+| Graph Edges | 935 |
+| Communities | 53 |
+| Extraction Confidence | 85% EXTRACTED · 15% INFERRED |
+| Token Reduction | **20.3x** fewer tokens per query |
+
+## Key Communities
+
+The knowledge graph reveals **53 interconnected communities** including:
+
+- **Mobile App UI Components** — React 19 + TailwindCSS 4 component hierarchy
+- **Dashboard Charts & Visualization** — Recharts, Nivo, and Mapbox analytics layer
+- **Receipt Upload & Processing Pipeline** — 10-step OCR → classification workflow
+- **Authentication & JWT Security** — Token-based auth with bcrypt passlib
+- **Classification & Learning System** — 4-layer decision system (User Correction > Fingerprint > Store Memory > AI)
+- **Docker & Deployment Infrastructure** — Pure Docker production with SSL/nginx reverse proxy
+- **Mapbox 3D Geo-Visualization** — Golden 3D pillars with drone fly-to animation
+
+## God Nodes (Core Abstractions)
+
+| Rank | Node | Connections |
+|------|------|-------------|
+| 1 | `formatCurrency()` | 21 edges |
+| 2 | `useViewMode()` | 19 edges |
+| 3 | `process_receipt_upload()` | 18 edges |
+| 4 | `get_settings()` | 17 edges |
+| 5 | `Receipt` model | 16 edges |
+
+## How to Explore
+
+### 1. Read the Report
+Open the full atomic analysis report:
+```bash
+# Markdown report — works in any editor or GitHub
+open GRAPH_REPORT.md
+
+# Or view on GitHub directly:
+# https://github.com/bkcsplayers/hackathon-receipts/blob/main/GRAPH_REPORT.md
+```
+
+### 2. Interactive Graph Visualization
+Open the interactive D3.js knowledge graph in any browser:
+```bash
+# Local HTML — no server required
+open graphify-out/graph.html
+```
+
+The HTML graph supports zoom, pan, search, and community-based exploration of all 577 nodes and 935 edges.
+
+### 3. Query the Graph
+Use graphify CLI to ask natural-language questions:
+```bash
+# BFS traversal — broad context
+graphify query "how does authentication work"
+
+# DFS traversal — trace specific paths
+graphify query "what connects upload to classification" --dfs
+
+# Find shortest path between two concepts
+graphify path "ReceiptUpload" "CategoryClassification"
+
+# Explain a specific node
+graphify explain "process_receipt_upload"
+```
+
+### 4. Regenerate After Code Changes
+```bash
+# Incremental update — AST only, no LLM cost
+graphify update .
+
+# Full regeneration with semantic re-extraction
+/graphify . --mode deep
+```
+
+---
 
 ---
 
