@@ -1,0 +1,75 @@
+version: "3.9"
+
+# Production compose for VPS with host nginx (Baota)
+# Host nginx handles SSL and proxies to localhost ports below.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: receipt_user
+      POSTGRES_PASSWORD: receipt_pass
+      POSTGRES_DB: hackathon_receipt
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U receipt_user -d hackathon_receipt"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "127.0.0.1:4510:8000"
+
+  worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python -m tasks.email_worker
+    restart: always
+
+  mobile:
+    build:
+      context: ./apps/mobile
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://hackathon.khtain.com
+    restart: always
+    ports:
+      - "127.0.0.1:4511:80"
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://hackathon.khtain.com
+        VITE_MAPBOX_TOKEN: ${MAPBOX_ACCESS_TOKEN}
+    restart: always
+    ports:
+      - "127.0.0.1:4512:80"
+
+volumes:
+  pgdata:
